@@ -4,7 +4,7 @@ SwingChromecast [![Build Status](https://travis-ci.org/DylanMeeus/SwingChromecas
 Swing client to interact with your chromecasts.
 This implementation is purely the frontend, it uses [Vitaly Litvak's
 API](https://github.com/vitalidze/chromecast-java-api-v2), which is an implementation
-of the ChromeCast V2 protocol. 
+of the ChromeCast V2 protocol.
 
 However, since the library is pulled from Maven you don't need to have it locally to run this
 client. (Provided you fetch it from Maven).
@@ -20,19 +20,20 @@ behind a VPN!)
 * Play / Pause media that is playing
 * Terminate running application
 * Change the volume
-
-## Future features
 * Play local files from your computer
 
-
+## TODO
+* Improve the UI (with ability to seek/fast forward/rewind)
+* Add command line params for file or url
+* Add support for DLNA
 
 # License information
 
 ## Frontend
-GNU GPLv3 
+GNU GPLv3
 Copyright (c) 2018 Dylan Meeus (meeusdylan@protonmail.com)
 
 ## Backend
 
 [chromecast-java-api-v2](https://github.com/vitalidze/chromecast-java-api-v2) Copyright (c) 2014
-Vitaly Litvak vitavaque@gmail.com 
+Vitaly Litvak vitavaque@gmail.com

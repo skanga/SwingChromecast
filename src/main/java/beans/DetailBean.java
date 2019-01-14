@@ -9,65 +9,75 @@ import su.litvak.chromecast.api.v2.Status;
 import java.util.Timer;
 import java.util.TimerTask;
 
-/**
- * Created by dylan on 18.01.18.
- */
-public class DetailBean extends Model {
+public class DetailBean extends Model
+{
+  // the real reference
+  private ChromeCast chromeCast;
+  public static String CHROMECAST = "chromeCast";
 
-    // the real reference
-    private ChromeCast chromeCast;
-    public static String CHROMECAST = "chromeCast";
+  private Status castStatus;
+  public static String CAST_STATUS = "chromecastStatus";
 
-    private Status castStatus;
-    public static String CAST_STATUS = "chromecastStatus";
+  private Status prevStatus;
 
-    private Status prevStatus;
+  public DetailBean ()
+  {
+    // set initial values
+    TimerTask updateChromeCastTask = new TimerTask ()
+    {
 
+      @Override
+      public void run ()
+      {
+        //System.out.println("Updating the chromecast?");
+        try
+        {
+          Status status = chromeCast.getStatus ();
+          if (status == null)
+          {
+            return;
+          }
+          if (!status.equals (prevStatus))
+          {
+            setCastStatus (status);
+          }
+        }
+        catch (NullPointerException npe)
+        {
+          // todo: avoid trigger chromecast npes!
+          if (chromeCast == null)
+          {
+            return;
+          }
+          npe.printStackTrace ();
+        }
+        catch (Exception e)
+        {
+          e.printStackTrace ();
+        }
+      }
+    };
+    Timer timer = new Timer ("updateChromecastTask");
+    timer.scheduleAtFixedRate (updateChromeCastTask, 0, 5000); // update every 5 seconds
+  }
 
-    public DetailBean(){
-        // set initial values
-        TimerTask updateChromeCastTask = new TimerTask(){
+  public void setChromeCast (ChromeCast chromeCast)
+  {
+    ChromeCast oldValue = this.chromeCast;
+    this.chromeCast = chromeCast;
+    firePropertyChange (CHROMECAST, oldValue, this.chromeCast);
+  }
 
-            @Override
-            public void run() {
-                //System.out.println("Updating the chromecast?");
-                try {
-                    Status status = chromeCast.getStatus();
-                    if (status == null) {
-                        return;
-                    }
-                    if (!status.equals(prevStatus)) {
-                        setCastStatus(status);
-                    }
-                } catch (NullPointerException npe) {
-                    // todo: avoid trigger chromecast npes!
-                    if (chromeCast == null) {
-                        return;
-                    }
-                    npe.printStackTrace();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        };
-        Timer timer = new Timer("updateChromecastTask");
-        timer.scheduleAtFixedRate(updateChromeCastTask, 0, 5000); // update every 5 seconds
-    }
+  private void setCastStatus (Status status)
+  {
+    //Status oldStatus = this.castStatus;
+    prevStatus = this.castStatus;
+    this.castStatus = status;
+    firePropertyChange (CAST_STATUS, prevStatus, status);
+  }
 
-    public void setChromeCast(ChromeCast chromeCast) {
-        ChromeCast oldValue = this.chromeCast;
-        this.chromeCast = chromeCast;
-        firePropertyChange(CHROMECAST, oldValue, this.chromeCast);
-    }
-
-    public void setCastStatus(Status status) {
-        Status oldStatus = this.castStatus;
-        this.castStatus = status;
-        firePropertyChange(CAST_STATUS, oldStatus, status);
-    }
-
-    public ChromeCast getChromeCast(){
-        return chromeCast;
-    }
-
+  public ChromeCast getChromeCast ()
+  {
+    return chromeCast;
+  }
 }

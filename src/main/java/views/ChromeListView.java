@@ -6,63 +6,67 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import pm.ChromeListPM;
 import pm.PM;
-import services.DefaultChromecastService;
-import services.MockChromecastService;
 import su.litvak.chromecast.api.v2.ChromeCast;
 import views.components.ChromecastCellRenderer;
 
-import com.jgoodies.binding.*;
-import javax.swing.*;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
+import javax.swing.BorderFactory;
+import javax.swing.DefaultListModel;
+import javax.swing.JComponent;
+import javax.swing.JList;
+import javax.swing.JPanel;
+import java.awt.Color;
 import java.util.List;
-import java.util.Objects;
-import java.util.TimerTask;
-import java.util.Timer;
 
-/**
- * Created by dylan on 14.01.18.
- */
-public class ChromeListView implements View {
+public class ChromeListView implements View
+{
+  private JPanel mainPanel;
+  private JList <ChromeCast> chromeCastList;
+  private PM chromeListPM = new ChromeListPM ();
 
-    private JPanel mainPanel;
-    private JList<ChromeCast> chromeCastList;
-    private PM chromeListPM = new ChromeListPM();
+  ChromeListView ()
+  {
+    setupGui ();
+    setupListeners ();
+  }
 
-    public ChromeListView(){
-        setupGui();
-        setupListeners();
+  private void setupGui ()
+  {
+    mainPanel = new JPanel ();
+    mainPanel.setBorder(BorderFactory.createLineBorder(Color.black));
+    chromeCastList = new JList <> ();
+    chromeCastList.setCellRenderer (new ChromecastCellRenderer ());
+    mainPanel.add (chromeCastList);
+  }
+
+  private void setupListeners ()
+  {
+    assert getPM () != null;
+    Bindings.bind (chromeCastList, ((ChromeListBean) getPM ().getBean ()).getChromecastList ());
+  }
+
+  private void populateJList (List <ChromeCast> chromecasts)
+  {
+    System.out.println (String.format ("Found %d chromecasts", chromecasts.size ()));
+    final DefaultListModel <ChromeCast> listModel = new DefaultListModel <> ();
+    for (ChromeCast c : chromecasts)
+    {
+      listModel.addElement (c);
     }
+    chromeCastList.setModel (listModel);
+    mainPanel.revalidate ();
+  }
 
-    private void setupGui(){
-        mainPanel = new JPanel();
-        chromeCastList = new JList<ChromeCast>();
-        chromeCastList.setCellRenderer(new ChromecastCellRenderer());
-        mainPanel.add(chromeCastList);
-    }
+  @Override
+  @NotNull
+  public JComponent getGui ()
+  {
+    return mainPanel;
+  }
 
-    private void setupListeners(){
-        Bindings.bind(chromeCastList, ((ChromeListBean)getPM().getBean()).getChromecastList());
-    }
-
-    private void populateJList(List<ChromeCast> chromecasts) {
-        System.out.println(String.format("Found %d chromecasts", chromecasts.size()));
-        final DefaultListModel<ChromeCast> listModel = new DefaultListModel<ChromeCast>();
-        chromecasts.forEach(c -> listModel.addElement(c));
-        chromeCastList.setModel(listModel);
-        mainPanel.revalidate();
-    }
-
-
-    @Override
-    @NotNull
-    public JComponent getGui() {
-        return mainPanel;
-    }
-
-    @Nullable
-    @Override
-    public PM getPM() {
-        return chromeListPM;
-    }
+  @Nullable
+  @Override
+  public PM getPM ()
+  {
+    return chromeListPM;
+  }
 }
